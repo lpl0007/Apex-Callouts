@@ -1,0 +1,21 @@
+global class AccessibilityProjectBilling{
+    @Future(callout=true)
+    public static void callBillingService(String projectId, Decimal billingAmount){
+        //Setup username, password, billAmount, and projectid in BillingServiceProxy.project and then call billProject method
+        BillingServiceProxy.project project = new BillingServiceProxy.project();
+        project.username = '{!$Credential.BillingServiceCredential.username}';
+        project.password = '{!$Credential.BillingServiceCredential.password}';
+        project.billAmount = Double.valueOf(billingAmount);
+        project.projectid = projectId;
+
+        BillingServiceProxy.InvoicesPortSoap11 stub = new BillingServiceProxy.InvoicesPortSoap11();
+         String status = stub.billProject(project);
+
+        //If response is ok set Accessibility Project Status = Complete
+        if (status == 'ok') {
+            Accessibility_Project__c accProject = [SELECT Id, Status__c FROM Accessibility_Project__c WHERE Id = :projectId LIMIT 1];
+            accProject.Status__c = 'Complete';
+            update accProject;
+        }
+    }
+}

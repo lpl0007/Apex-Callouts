@@ -4,26 +4,35 @@ public class WellnessJourneyRewardsBatchTest {
     static void setup() {
         User testUser1 = new User(
             FirstName = 'Test',
-            LastName = 'User 1',
-            Email = 'testUser1@example.com',
-            Username = 'testUser1@example.com',
+            LastName = 'User1',
+            Email = 'testUserkN5PsOOQU!@9oqls@example.com',
+            Username = 'testUserH#^6q7AQmP7sCe98@example.com',
             Alias = 'testUser1',
-            ProfileId = [SELECT Id FROM Profile WHERE Name='Standard User' LIMIT 1].Id
+            ProfileId = [SELECT Id FROM Profile WHERE Name='Standard User' LIMIT 1].Id,
+            TimeZoneSidKey = 'America/Los_Angeles',
+            LocaleSidKey = 'en_US',
+            EmailEncodingKey = 'UTF-8',
+            LanguageLocaleKey = 'en_US'
         );
         insert testUser1;
 
         User testUser2 = new User(
             FirstName = 'Test',
-            LastName = 'User 2',
-            Email = 'testUser2@example.com',
-            Username = 'testUser2@example.com',
+            LastName = 'User2',
+            Email = 'testUserhU*qw$IG*v9Cv9JX@example.com',
+            Username = 'testUserX&**&dM6A7xUwfYn@example.com',
             Alias = 'testUser2',
-            ProfileId = [SELECT Id FROM Profile WHERE Name='Standard User' LIMIT 1].Id
+            ProfileId = [SELECT Id FROM Profile WHERE Name='Standard User' LIMIT 1].Id,
+            TimeZoneSidKey = 'America/Los_Angeles',
+            LocaleSidKey = 'en_US',
+            EmailEncodingKey = 'UTF-8',
+            LanguageLocaleKey = 'en_US'
         );
         insert testUser2;
 
         List<Wellness_Journey__c> journeys = new List<Wellness_Journey__c>();
-        for (Integer i = 0; i < 10; i++) {
+        
+        for (Integer i = 0; i < 13; i++) {
             journeys.add(new Wellness_Journey__c(
                 Name = 'Journey ' + i,
                 OwnerId = testUser1.Id,
@@ -32,9 +41,9 @@ public class WellnessJourneyRewardsBatchTest {
             ));
         }
 
-        for (Integer i = 0; i < 10; i++) {
+        for (Integer i = 0; i < 5; i++) {
             journeys.add(new Wellness_Journey__c(
-                Name = 'Journey ' + (10 + i),
+                Name = 'Journey ' + (13 + i),
                 OwnerId = testUser2.Id,
                 Status__c = 'Complete',
                 Completion_Date__c = Date.today().addDays(-90)
@@ -47,13 +56,12 @@ public class WellnessJourneyRewardsBatchTest {
     @isTest
     static void testWellnessJourneyRewardsBatch() {
         Test.setMock(HttpCalloutMock.class, new RewardsCalloutServiceMock());
-
+        
         Test.startTest();
-        WellnessJourneyRewardsBatch batch = new WellnessJourneyRewardsBatch();
-        Database.executeBatch(batch);
+        Database.executeBatch(new WellnessJourneyRewardsBatch());
         Test.stopTest();
 
         List<Wellness_Journey__c> processedJourneys = [SELECT Id FROM Wellness_Journey__c WHERE Status__c = 'Complete'];
-        System.assertEquals(20, processedJourneys.size());
+        System.assertEquals(18, processedJourneys.size());
     }
 }

@@ -15,9 +15,9 @@ global class WellnessJourneyRewardsBatch implements Database.Batchable<sObject>,
                
         // Initialize the map with user IDs and set the initial count to 0
         for (Wellness_Journey__c journey : scope) {
-            userGoalCountMap.put(journey.OwnerId, 0);        
+            userGoalCountMap.put(journey.OwnerId, 0);
         } 
-         
+        
         for (Wellness_Journey__c journey : scope) {
             // Calculate the number of journeys completed by each user
             Integer goalCount = userGoalCountMap.get(journey.OwnerId);
@@ -26,7 +26,7 @@ global class WellnessJourneyRewardsBatch implements Database.Batchable<sObject>,
 
             // Check if the user has completed atleast 12 goals in the quarter and hasn't already been added to the array
             if(userGoalCountMap.get(journey.OwnerId)>=12 && !uniqueUserId.contains(journey.OwnerId)){
-            	Map<String, Object> userObj = new Map<String, Object>();
+            Map<String, Object> userObj = new Map<String, Object>();
 
                 uniqueUserId.add(journey.OwnerId);
                
@@ -39,6 +39,7 @@ global class WellnessJourneyRewardsBatch implements Database.Batchable<sObject>,
                 //Add to array
                 usersListMap.add(userObj);
             }
+            
         }
         
         //Serialize JSON
@@ -47,7 +48,7 @@ global class WellnessJourneyRewardsBatch implements Database.Batchable<sObject>,
         //Invoke Callout
         Integer responseCode = RewardsCalloutService.submitUsersForRewardCallout(jsonBody);
         
-        System.debug('HTTP Response Code: ' + responseCode);        
+        System.debug('HTTP Response Code: ' + responseCode);
     }
 
     global void finish(Database.BatchableContext BC) {
